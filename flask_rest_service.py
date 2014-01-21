@@ -75,6 +75,7 @@ class DirWalker(object):
                     print len(path)*'---', file
 
             if self.match_regex:
+                # "re.match" matches the beginning of the string.
                 # This match is not context aware. Feel free to change it!
                 if re.match(self.match_regex,root):
                     self.all_roots.append(root) 
@@ -145,17 +146,19 @@ def retrieve_listing(source,listing_type,startswith):
     #print "Response:",resp.headers,resp.response
 
 
-@app.route("/contents/<regex('.*'):file_regex>/dir/<path:dirname>", 
+@app.route("/contents/<regex('.*'):file_startswith_regex>/dir/<path:dirname>", 
     methods=['GET','POST','DELETE'])
 @crossdomain(origin='*')
-def individual_files(dirname,file_regex):
+def individual_files(dirname,file_startswith_regex):
 
     dirname = '/' + dirname
     if request.method == 'GET':
-        dw = DirWalker(directory=dirname,match_regex=file_regex)
+        # Instead of constructing regex, yours is passed stright through to the search.
+        # Don't run this on a publicly accessible server, this is a giant security hole. 
+        dw = DirWalker(directory=dirname,match_regex=file_startswith_regex)
         dw.walkit()
         return jsonify({
-            'matched_pattern':file_regex,
+            'matched_pattern':file_startswith_regex,
             'walked directory':dirname,
             'root':dw.all_roots[0] if dw.all_roots else None,
             'dirs':dw.all_dirs,
@@ -174,7 +177,7 @@ def individual_files(dirname,file_regex):
         try:
             os.remove('some match here...')
             return  jsonify({
-                'results':'purged %s' % file_regex
+                'results':'purged %s' % file_startswith_regex
                 })
 
         except OSError as e:
@@ -186,7 +189,7 @@ def individual_files(dirname,file_regex):
             considered an error here.
            
             return jsonify({
-               'results':'file not present: %s' % file_regex
+               'results':'file not present: %s' % file_startswith_regex
                 })
         '''
 
