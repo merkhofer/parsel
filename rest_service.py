@@ -45,6 +45,45 @@ def custom_401(error):
 def custom_404(error):
     return Response('Requested listing cannot be found', 404, {})
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class DirWalker(object):
+    def __init__(self,directory,level=None,match_regex=None,debug=True):
+        self.level = level # None = traverse whole tree
+        self.directory = directory
+        self.debug = debug
+        self.match_regex = match_regex
+        self.all_roots = []
+        self.all_dirs = []
+        self.all_files = []
+
+    def walkit(self):
+        self.all_roots = []
+        self.all_dirs = []
+        self.all_files = []
+        level_traverse = 0
+        for root, dirs, files in os.walk(self.directory):
+            if self.level and (level_traverse >= self.level):
+                break
+
+            level_traverse += 1
+            path = root.split('/')
+            if self.debug:
+                print (len(path) - 1) *'---' , os.path.basename(root)       
+
+                for file in files:
+                    print len(path)*'---', file
+
+            if self.match_regex:
+                # This match is not context aware. Feel free to change it!
+                if re.match(self.match_regex,root):
+                    self.all_roots.append(root) 
+                self.all_dirs += [x for x in dirs if re.match(self.match_regex,x)]
+                self.all_files += [x for x in files if re.match(self.match_regex,x)]
+            else:
+                self.all_roots += [root]
+                self.all_dirs += dirs
+                self.all_files += files
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Pass directory or file listing data out.
 @app.route("/source/<string:source>/listing/<int:listing_type>/startswith/<string:startswith>/", 
@@ -55,53 +94,34 @@ def custom_404(error):
 
 def retrieve_listing(source,listing_type,startswith):
 
+    # Generate regex that will match on any combo of lower and upper case.
     starts_lu = None
     if startswith:
         starts_lu = ''.join(['[' + x.lower() + x.upper() + ']' for x in startswith])
 
     if 'dir' in source:
 
+        dw = DirWalker(directory=WALK_DIR, match_regex=starts_lu)
+
         if listing_type == 1:
             # 1 = short listing
-            root, dirs, files = os.walk(WALK_DIR).next()
-            if starts_lu:
-                dirs = [x for x in dirs if re.match(starts_lu,x)]
-                files = [x for x in files if re.match(starts_lu,x)]
+            dw.level=1
+            dw.walkit()
             return jsonify({
                 'matched_pattern':starts_lu,
-                'root':root,
-                'dirs':dirs,
-                'files':files
+                'root':dw.all_roots[0] if dw.all_roots else None,
+                'dirs':dw.all_dirs,
+                'files':dw.all_files
                 })
 
         elif listing_type == 2:
-
             # 2 = long listing
-            all_roots = []
-            all_dirs = []
-            all_files = []
-            for root, dirs, files in os.walk(WALK_DIR):
-                path = root.split('/')
-                print (len(path) - 1) *'---' , os.path.basename(root)       
-
-                for file in files:
-                    print len(path)*'---', file
-
-                if starts_lu:
-                    if re.match(starts_lu,root):
-                        all_roots.append(root) 
-                    all_dirs += [x for x in dirs if re.match(starts_lu,x)]
-                    all_files += [x for x in files if re.match(starts_lu,x)]
-                else:
-                    all_roots += root
-                    all_dirs += dirs
-                    all_files += files
-
+            dw.walkit()
             return jsonify({
                 'matched_pattern':starts_lu,
-                'roots':all_roots,
-                'dirs':all_dirs,
-                'files':all_files
+                'roots':dw.all_roots,
+                'dirs':dw.all_dirs,
+                'files':dw.all_files
                 })
         else:
             abort(404)
@@ -123,16 +143,22 @@ def retrieve_listing(source,listing_type,startswith):
     #print "Response:",resp.headers,resp.response
 
 
-@app.route("/dir/<string:dirname>/contents/<regex('.*'):filename>/", 
+@app.route("/contents/<regex('.*'):file_regex>/dir/<path:dirname>", 
     methods=['GET','POST','DELETE'])
 @crossdomain(origin='*')
-def individual_files(source,fileregex):
+def individual_files(dirname,file_regex):
 
+    dirname = '/' + dirname
     if request.method == 'GET':
-        if 'dir' in source:
-            pass
-        elif 'tar' in source:
-            pass
+        dw = DirWalker(directory=dirname,match_regex=file_regex)
+        dw.walkit()
+        return jsonify({
+            'matched_pattern':file_regex,
+            'walked directory':dirname,
+            'root':dw.all_roots[0] if dw.all_roots else None,
+            'dirs':dw.all_dirs,
+            'files':dw.all_files
+            })
 
     elif request.method == 'POST':
         return jsonify({
@@ -140,24 +166,27 @@ def individual_files(source,fileregex):
             })
 
     elif request.method == 'DELETE':
+        pass
+        '''
         # Living dangerously...
         try:
-            os.remove(filename)
+            os.remove('some match here...')
             return  jsonify({
-                'results':'purged %s' % filename
+                'results':'purged %s' % file_regex
                 })
 
         except OSError as e:
             if e.errno != errno.ENOENT:
                 raise
 
-            '''
+            
             Trying to delete a file that is not present is not 
             considered an error here.
-            '''
+           
             return jsonify({
-               'results':'file not present: %s' % filename
+               'results':'file not present: %s' % file_regex
                 })
+        '''
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -171,6 +200,7 @@ http://%(HOST)s:%(PORT)s/source/dir/listing/2<br>
 http://%(HOST)s:%(PORT)s/source/dir/listing/1/startswith/N<br>
 http://%(HOST)s:%(PORT)s/source/dir/listing/2/startswith/N<br>
 http://%(HOST)s:%(PORT)s/source/tar/listing/1/startswith/N<br>
+http://%(HOST)s:%(PORT)s/contents/some_regex/dir/dirname<br>
         ''' % globals()
 
 if __name__ == '__main__':
