@@ -7,12 +7,12 @@ import json
 import shutil
 import pprint
 
-#PROJECT_ROOT = os.path.realpath(os.path.dirname(__file__))
-#sys.path.append(PROJECT_ROOT)
-#sys.path.append(os.path.join(PROJECT_ROOT, ".."))
+PROJECT_ROOT = os.path.realpath(os.path.dirname(__file__))
+sys.path.append(PROJECT_ROOT)
+sys.path.append(os.path.join(PROJECT_ROOT, ".."))
 
-from flask_jsonpify import jsonify
-from cross_domain import crossdomain
+from inc.flask_jsonpify import jsonify
+from inc.cross_domain import crossdomain
 
 from flask import Flask,request,abort,Response,make_response
 from werkzeug.routing import BaseConverter
@@ -22,7 +22,9 @@ import tarfile
 
 app = Flask(__name__)
 
+# Change this directory to some dir on your machine. Only run this locally, don't run online.
 WALK_DIR='/two/Music'
+
 TAR_FILE='example.tar'
 HOST="127.0.0.1"
 PORT=7000
@@ -188,8 +190,10 @@ def individual_files(dirname,file_regex):
                 })
         '''
 
+# Catch-all
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
+@crossdomain(origin='*')
 def catch_all(path):
     return '''
 <br>
