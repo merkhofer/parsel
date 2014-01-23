@@ -1,14 +1,14 @@
 var flask_ftm_server = "http://127.0.0.1:7000/";
 
-var file_tar_module = angular.module("FTSERVICE", ["ngResource","angularBootstrapNavTree"]);
+var FileTarModule = angular.module("fileTarModule", ["ngResource","angularBootstrapNavTree"]);
 
-file_tar_module.factory("AngularFTMService", function($resource){
+FileTarModule.factory("AngularFTMService", function($resource){
     return {
         // Don't use JSONP: deserialization problems.
         //content_list: $resource(flask_ftm_server + "source/:source/listing/:ltype/?callback=placeholder", 
-        source_list: $resource("http://127.0.0.1:7000/source/:source/listing/:ltype/ ", 
+        source_list: $resource(flask_ftm_server + "source/:source/listing/:ltype/ ", 
              //{format:'json'},
-             {source: '@source', ltype:'@listing_type'},
+             {source: '@source', ltype:'@this_doesnt_seem_to_matter'},
              {query: {/*cache:true,*/ method:'GET', params:{}, isArray:false}}
         ),
         source_list_startswith: $resource(flask_ftm_server + "source/:source/listing/:ltype/startswith/:sometext ", 
@@ -24,8 +24,7 @@ file_tar_module.factory("AngularFTMService", function($resource){
        }
     });
 
-
-var fileTarController = function($scope,$http,FTSERVICE) {
+var fileTarController = function($scope,$http,AngularFTMService) {
     $http.defaults.useXDomain = true; // Necessary for external services.
 
     var api_failed = function(failure) {
@@ -33,15 +32,14 @@ var fileTarController = function($scope,$http,FTSERVICE) {
         }
 
     $scope.fileTarScope = {source:null, listing_type:null, sometext:null,
-        someregex:null, abs_dir:null, source_list:null};
+        someregex:null, abs_dir:null, source_list:[]};
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Calls to resources
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     $scope.fileTarScope.get_source_list = function() {
-        FTSERVICE["source_list"].query(
-            // Parameters {source: '@source', ltype:'@listing_type'}
-            {source:$scope.fileTarScope.source, listing_type:$scope.fileTarScope.listing_type},
+        AngularFTMService["source_list"].query(
+            {source:$scope.fileTarScope.source, ltype:$scope.fileTarScope.listing_type},
             function(data) {
                 // Success of some kind
                 $scope.fileTarScope.source_list = data;
@@ -50,7 +48,7 @@ var fileTarController = function($scope,$http,FTSERVICE) {
                 },
             function(failure) {
                 // failure
-                $scope.fileTarScope.source_list = null;
+                $scope.fileTarScope.source_list = [];
                 //$scope.fileTarScope.dir_structure = [];
                 if(failure.status == 404) {
                     console.log("File/Tar list not found:" + failure.toSource());
@@ -59,8 +57,9 @@ var fileTarController = function($scope,$http,FTSERVICE) {
                     console.log("File/Tar list call failed!:" + failure.toSource());
                     }
                 });
-        }
-
+        } 
+    };
+    /*
     $scope.fileTarScope.get_contents = function() {
         $scope.fileTarScope.contents = CTSAPI["contents"].query({container_id:$scope.fileTarScope.container_id});
         }
@@ -72,6 +71,7 @@ var fileTarController = function($scope,$http,FTSERVICE) {
     $scope.fileTarScope.get_file_by_url = function() {
         $scope.fileTarScope.by_url_results = CTSAPI["file_by_url"].query({container_id:$scope.fileTarScope.container_id,file_url:$scope.fileTarScope.file_url});
         }
+     */
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Watch events
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,22 +80,4 @@ var fileTarController = function($scope,$http,FTSERVICE) {
         $scope.x = newVal;
         }); */
 
-    };
-
-file_tar_module.directive("containerDirective", function () {
-    return {
-        restrict: "EA",
-        link: function (scope, element, attrs) {
-            scope.$watch(attrs.ngModel, function (v) {
-                console.log('value changed, new value is: ' + v);
-                });
-            },
-        //transclude: true,
-        //template: 'Here: <table> \
-        //               <tr ng-repeat="c in scope.fileTarScope.content_list.results.flist"> \
-        //                   <td ng-bind="c">Loop</td> \
-        //               </tr> \
-        //           </table> end here <div ng-transclude></div>'
-        }
-    });
-
+    //};

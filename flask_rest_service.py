@@ -47,9 +47,53 @@ def custom_401(error):
 def custom_404(error):
     return Response('Requested listing cannot be found', 404, {})
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+'''
+class NavTree(object):
+    def __init__(self):
+        self.front_end_tree = []
+
+    Not yet...
+    def store(files,dirs,root):
+        # Root must always be complete from the source directory.
+        # It does not have to be an absolute path, but must be like this:
+        # one/Music/, one/Music/blues/, one/Music/blues/1920s/, etc.
+        subtree = self.front_end_tree
+        treedirs = root.split('/')
+        depth = 0
+        for treedir in treedirs:
+            depth += 1
+            if treedir not in subtree:
+                if depth == len(treedirs):
+                    subtree.append({'children':files + dirs,'label':treedir})
+            else:
+                subtree.append(
+
+        for k in sub_dict:
+            #new_label = {'label':None, 'data':{'description':None}, 'children':[]}
+            new_label = {'label':None, 'children':[]}
+            new_label['label'] = k
+            if k != 'files':
+                if isinstance(sub_dict[k],dict):
+                    recurse_dict(sub_dict[k],new_label['children'])
+                    branch.append(new_label)
+                    new_label = {'label':None, 'children':[]}
+                else:
+                    raise ValueError("Something bad happened here...")
+            else:
+                # All listings end in file names.
+                new_label['children'] += sub_dict[k]
+                branch.append(new_label)
+                new_label = {'label':None, 'children':[]}
+
+    recurse_dict(file_sorting['dir_structure'],front_end_tree)
+
+    file_sorting['dir_structure'] = front_end_tree
+'''
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class DirWalker(object):
-    def __init__(self,directory,level=None,match_regex=None,debug=True):
-        self.level = level # None = traverse whole tree
+    def __init__(self,directory,limit=None,match_regex=None,debug=True):
+        self.limit = limit # None = traverse whole tree
         self.directory = directory
         self.debug = debug
         self.match_regex = match_regex
@@ -61,12 +105,14 @@ class DirWalker(object):
         self.all_roots = []
         self.all_dirs = []
         self.all_files = []
-        level_traverse = 0
+        limit_traverse = 0
         for root, dirs, files in os.walk(self.directory):
-            if self.level and (level_traverse >= self.level):
+            if self.limit and (limit_traverse >= self.limit):
                 break
 
-            level_traverse += 1
+            # Limit is not the same as level in the file hierarchy.
+            # It's just a way to demo a reduced data set.
+            limit_traverse += 1
             path = root.split('/')
             if self.debug:
                 print (len(path) - 1) *'---' , os.path.basename(root)       
@@ -108,7 +154,7 @@ def retrieve_listing(source,listing_type,startswith):
 
         if listing_type == 1:
             # 1 = short listing
-            dw.level=1
+            dw.limit=1
             dw.walkit()
             return jsonify({
                 'matched_pattern':starts_lu,
@@ -119,6 +165,7 @@ def retrieve_listing(source,listing_type,startswith):
 
         elif listing_type == 2:
             # 2 = long listing
+            dw.limit=10
             dw.walkit()
             return jsonify({
                 'matched_pattern':starts_lu,
@@ -138,7 +185,7 @@ def retrieve_listing(source,listing_type,startswith):
         if starts_lu:
             listing = [x for x in listing if re.match(starts_lu,x)]
 
-        return jsonify({'names': listing, 'tarfile': TAR_FILE})
+        return jsonify({'files': listing, 'tarfile': TAR_FILE})
 
     else: 
         raise Exception("Unknown option: %s" % source)

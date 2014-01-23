@@ -17,7 +17,7 @@ from flask import Flask,render_template, send_from_directory
 from werkzeug.routing import BaseConverter
 
 # Note the custom template directory.
-app = Flask(__name__,template_folder='./htmls')
+app = Flask(__name__,template_folder=PROJECT_ROOT + '/htmls')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @app.errorhandler(401)
@@ -35,11 +35,13 @@ def custom_404(error):
 
 @app.route('/js/<path:filename>')
 def custom_js_static(filename):
-    return send_from_directory('./js/', filename)
+    return send_from_directory(os.path.join(PROJECT_ROOT,'js'),
+        filename,mimetype='text/javascript')
 
 @app.route('/css/<path:filename>')
 def custom_css_static(filename):
-    return send_from_directory('./css/', filename)
+    return send_from_directory(os.path.join(PROJECT_ROOT,'css'),
+        filename,mimetype='text/css')
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Catch-all

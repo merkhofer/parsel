@@ -5,15 +5,15 @@
 {% endblock %}
 
 {% block head_content %}
-<link href="/css/abn_tree.css" rel="stylesheet"/>
+<link href="http://127.0.0.1:8000/css/tabs.css" rel="stylesheet"/>
+<link href="http://127.0.0.1:8000/css/abn_tree.css" rel="stylesheet"/>
 {% endblock %}
-
 
 {% block body_content %}
 <div class="container">
 
   <div class="row" id="row_1" >
-       <div ng-app="file_tar_module" id="file_tar_source_id">
+       <div ng-app="fileTarModule" id="file_tar_source_id">
        <div ng-controller="fileTarController">
 
        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -28,7 +28,7 @@
 
                     <div ng-app="angularBootstrapNavTree" id="nav_tree_id">
                         <!--span ng-bind="fileTarScope.dir_structure.toSource()">Here</span-->
-                        <abn-tree tree-data="fileTarScope.dir_structure" icon-leaf="icon-file"
+                        <abn-tree tree-data="fileTarScope.source_list" icon-leaf="icon-file"
                              icon-expand="icon-plus-sign" icon-contract="icon-minus-sign" 
                              on-select="my_tree_handler(branch)" expand-level="2"></abn-tree>
                     </div>
@@ -40,15 +40,22 @@
             <div ng-show="tab == 2">
 
                 <div ng-show="fileTarScope.source_list != null">
+                   <br>Files:<br>
                    <table>
-                       <tr ng-repeat="f in fileTarScope.source_list">
-                           <td>File: <span ng-bind="f"><span></td>
+                       <tr ng-repeat="t in fileTarScope.source_list.files | orderBy:'toString()' | filter:searchText">
+                           <td><span ng-bind="t"></span></td>
                        </tr>
                    </table>
-                </div>
+                   <br>Directories:<br>
+                   <table>
+                       <tr ng-repeat="t in fileTarScope.source_list.dirs | orderBy:'toString()' | filter:searchText">
+                           <td><span ng-bind="t"></span></td>
+                       </tr>
+                   </table>
+                </div><!-- ng-show source_list -->
 
             </div><!-- ng-show tab = 2-->
-        </div>
+        </div><!-- ng-init tabs -->
 
        </div><!-- col-md-9 -->
 
@@ -56,27 +63,16 @@
        <div class="col-md-3 col-md-pull-9">left column: .col-md-9 .col-md-pull-9
 
        <form ng-submit="fileTarScope.get_source_list()" id="fts_api_form_id" name="fts_api_form">
-           <input type="text" ng-model="fileTarScope.listing_type" ng-init="fileTarScope.listing_type='1'" required>Listing Type (1=short, 2=long)</input><br>
-           <input type="text" ng-model="fileTarScope.source" ng-init="fileTarScope.source='dir'" required>Source (dir/tar)</input><br>
+           <br>Listing Type (1=short, 2=long)<br>
+           <input type="text" ng-model="fileTarScope.listing_type" ng-init="fileTarScope.listing_type='1'" required></input><br><br>
+           Source (dir/tar)<br>
+           <input type="text" ng-model="fileTarScope.source" ng-init="fileTarScope.source='dir'" required></input><br><br>
            <input type="submit" id="submit" value="list files from source"></input>
        </form>
 
-       <container-directive>
        <div ng-show="fileTarScope.source_list != null">
-           <p>Total of <span ng-bind="fileTarScope.source_list.length"></span> entries.</p>
-           <table>
-               <tr ng-repeat="(t,num) in fileTarScope.source_list">
-                   <td><span ng-bind="num"></span> of type <span ng-bind="t"></span></td>
-               </tr>
-           </table>
-           <span ng-repeat="(t,num) in fileTarScope.source_list.results.ftypes">
-               <label class="checkbox" for="{{t}}">
-               <input type="checkbox" ng-model="fileTarScope.source_list.results.ftypes" name="cts_filetypes" id="{{t}}" />
-               {{t}}
-               </label>
-           </span>
+           <p>Total <span ng-bind="fileTarScope.source_list.files.length"></span> files, <span ng-bind="fileTarScope.source_list.dirs.length"></span> directories.</p>
        </div><!-- ng-show -->
-       </container-directive>
 
        </div> <!-- col-md-3 -->
 
@@ -86,15 +82,14 @@
   </div><!-- row_1 -->
 
 {% block script_content %}
-    <script src="http://127.0.0.1:8000/js/angular_file_tar.js" type="text/javascript" ></script>
-    <script src="http://127.0.0.1:8000/js/abn_tree_directive.js" type="text/javascript" ></script>
-
+<script src="http://127.0.0.1:8000/js/angular_file_tar.js" type="text/javascript" ></script>
+<script src="http://127.0.0.1:8000/js/abn_tree_directive.js" type="text/javascript" ></script>
 
 <script type="text/javascript">
-    // Manual bootstrap is necessary for multiple angular controllers on the same page.
-    angular.element(document).ready(function() {
-        angular.bootstrap(document.getElementById('file_tar_source_id'), ['file_tar_module']);
-   });
+    // Debugging
+    //angular.element(document).ready(function() {
+    //    angular.bootstrap(document.getElementById('file_tar_source_id'), ['fileTarModule']);
+    //   });
 </script>
 
 {% endblock %}<!-- script_content -->
