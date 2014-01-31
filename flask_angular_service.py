@@ -13,7 +13,7 @@ sys.path.append(os.path.join(PROJECT_ROOT, ".."))
 from inc.flask_jsonpify import jsonify
 from inc.cross_domain import crossdomain
 
-from flask import Flask,render_template, send_from_directory
+from flask import Flask,render_template, send_from_directory,Response
 from werkzeug.routing import BaseConverter
 
 # Note the custom template directory.
@@ -54,3 +54,4 @@ def catch_all(path):
 
 if __name__ == '__main__':
     app.run(debug=True, host="127.0.0.1", port=8000)
+
