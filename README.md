@@ -1,12 +1,10 @@
-flask_angular
-=============
+Parsel
+======
 
-Flask ReST service shows directory and tar file contents with options regex.
-This is for class demo purposes only. Don't run this on a publicly accessible server, unless
-you want the entire world to see and mess with the contents of your hard drive. 
+Parsel is a very simple NLTK demo using Flask. A user can select which NLTK preprocessing techniques to run on an input string. Currently, sentence tokenizers, word tokenizers, "bag of words" and POS tagging are included (though not all fully implemented).
 
-Two Flask prcoeses need to be run on the command line:
-- flask_rest_service.py (change WALK_DIR to some directory on your system to which you have access as yourself).
-- flask_angular_service.py (serves the Angular code, does nothing more)
+It is primarily being built a training ground for me on Flask/Jinja.
 
-The flask_rest_service provides data for the flask_angular_service. 
+TODO:
+Take a URL (use Beautiful Soup)
+Add more NLTK functionality.

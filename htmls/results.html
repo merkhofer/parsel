@@ -1,0 +1,46 @@
+
+{% extends "base.html" %}
+{% block content %}
+<html lang="en">
+<body>
+	<div id="tokenized">
+    	<h1>Tokenized</h1>
+    	<ul>
+    	{% for sentence in results['tokenized'] %}
+    	<li>
+    	{% if sentence|is_list %}
+    		{% for word in sentence %}
+    		<p style="outline-style:solid;outline-width:1px;display:inline;padding:3px;">{{word}}</p>
+    		{% endfor %}
+    		{% else %}
+    		<p style="outline-style:solid;outline-width:1px;display:inline;padding:3px;">{{sentence}}</p>
+    		{% endif %}	
+    	</li>
+    	</ul>	
+    	{% endfor %}	
+    </div>		
+	<div id="wordcount">
+		<h1>Bag of Words {{results['bag_of_words']}}</h1>
+		{% if not results['bag_of_words'] %}
+			<p>No bag of tokens available. Didn't you want one?</p>
+		{% else %}
+		<ul>
+		{% for term in results['bag_of_words'] %}
+		<li>{{term[0]}}  {{term[1]}}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+	</div>
+	<div>
+		<h1>Part of Speech Tagging {{results['pos']}}</h1>
+		{% if not results['pos'] %}
+		<p>No POS tag result returned.</p>
+		{% else %}
+		<ul>
+		{% for term in results['wordcount'] %}
+		<li>{{term[0]}}  {{term[1]}}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+	</div>
+{% endblock %}

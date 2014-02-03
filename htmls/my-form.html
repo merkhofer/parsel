@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<html lang="en">
+<body>
+	<div id="get_text">
+    	<h1>Enter some text</h1>
+    	<form action="." method="POST">
+    		<textarea name="text" class="form-control" rows="10"></textarea>
+    </div>		
+		<div class="row">
+		<div class="col-sm-6 thumbnail" style="padding-bottom:15px" id="tokenizers">
+		<h1 style="text-align:center">Tokenizers</h1>
+		<div class="col-sm-6">
+			<h2>Sentence Tokenizer</h2>
+			<p>In NLTK, you really should tokenize into sentences before anything else... but who am I to tell you what to do?</p>
+			<div class="btn-group-vertical" data-toggle="buttons" id="sent_tokenizer">
+				<label class="btn btn-primary">
+				    <input type="radio" name="sent_tokenizer" value="sentence_tokenize"> Punkt Sentence Tokenizer
+				</label>
+				<label class="btn btn-primary">
+				   <input type="radio" name="sent_tokenizer" value="no_sentence"> Live Dangerously
+				</label>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<h2>Word Tokenizer</h2>
+			<div class="btn-group-vertical" data-toggle="buttons" id="tokenizer_type">
+			  <label class="btn btn-primary">
+			    <input type="radio" name="tokenizer" value="whitespace" id="whitespace"> Whitespace Tokenizer
+			  </label>
+			  <label class="btn btn-primary">
+			    <input type="radio" name="tokenizer" value="wordpunkt" id="wordpunkt"> Punkt Word Tokenizer
+			  </label>
+			  <label class="btn btn-primary">
+			    <input type="radio" name="tokenizer" value="regexp" id="regexp"> Regex Tokenizer
+			  </label>
+			  <label class="btn btn-primary">
+			    <input type="radio" name="tokenizer" value="treebank" id="treebank"> Treebank Word Tokenizer
+			  </label>
+			</div>
+		</div>	
+	</div> <!--close the thumbnail around the tokenizers-->
+	<div class="col-sm-3">
+		<h2>Throw in a bag of words!</h2>
+		<p>Technically, you'll get a bag of tokens, whatever that means to you.</p>
+			<button type="button" data-toggle="button" class="btn btn-primary" name="make_bag" value="make_bag"> Bag 'o Words </button>
+	</div>
+
+		<h2>Part of Speech Tagging</h2>
+		<p>Get the results of a part of speech tagger, sentence by sentence.</p>
+			<button type="button" data-toggle="button" class="btn btn-warning" name="pos_tag" id="pos_tag"> Return Part of Speech tagging </button>
+	</div>		
+
+    <button type="submit" name="my-form" class="btn btn-lg btn-default">Submit</button> 
+    </form>
+    <form action="{{ url_for('new_task') }}" method="POST" class="new-task">
+
+</div>
+</label>
+  </div>
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script> 
+$('.btn').button();
+</script>
+{% endblock %}
