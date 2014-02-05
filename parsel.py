@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from flask import Flask,request,render_template
 import sys
 import os
@@ -20,6 +22,8 @@ def get_params():
 def my_form_post():
     processes = {}
     text = request.form['text']
+    if not text:
+        return "Where's the text? I'm not making a pretty page for this... press back."
     processes['sent_tokenize'] = request.form.get('sent_tokenizer')
     #tuple of tokenizer type and regex. If irrelevant, regex is ignored
     t_type = request.form.get('tokenizer')

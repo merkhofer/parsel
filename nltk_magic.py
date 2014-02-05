@@ -1,6 +1,17 @@
+#!/usr/bin/python
+
 import nltk.data
 from nltk.tokenize import WordPunctTokenizer,RegexpTokenizer,WhitespaceTokenizer,TreebankWordTokenizer
-from collections import Counter
+import nltk
+from collections import Counter,Iterable
+
+def flatten(l):
+    for el in l:
+        if isinstance(el, Iterable) and not isinstance(el, basestring):
+            for sub in flatten(el):
+                yield sub
+        else:
+            yield el
 
 def nltk_magic(text, processes):
 	return_me = {'tokenized' : None, 'bag_of_words' : None, 'pos' : None}
@@ -16,8 +27,8 @@ def nltk_magic(text, processes):
 		return_me['tokenized'] = tokenized
 	if processes['make_bag']:
 		return_me['bag_of_words'] = make_bag(tokenized)
-	if 'pos_tag':
-		return_me['pos'] = pos_tag(tokenized)
+	if processes['pos_tag']:
+		return_me['pos'] = [pos_tag(tokenized_sentence) for tokenized_sentence in tokenized]
 	return return_me	
 
 def sent_tokenize(in_string):
@@ -48,13 +59,12 @@ def tokenize(sent,tokenizer_type):
 		pass
 
 def make_bag(list_of_tokens):
-	#TODO: flatten the list first
-	bag = Counter(list_of_tokens)
-	return "HELLO"
+	flat_list = flatten(list_of_tokens)
+	bag = Counter(flat_list)
+	return bag
 
 def pos_tag(tokenized_sent):
-	#NOT IMPLEMENTED
-	return tokenized_sent	
+	return nltk.pos_tag(tokenized_sent)
 
 
 
