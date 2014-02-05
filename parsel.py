@@ -1,6 +1,4 @@
-from flask import Flask
-from flask import request
-from flask import render_template,flash
+from flask import Flask,request,render_template
 import sys
 import os
 import nltk_magic
@@ -15,8 +13,8 @@ def is_list(some_object):
     return isinstance(some_object, list)
 
 @app.route('/')
-def my_form():
-    return render_template("my-form.html")
+def get_params():
+    return render_template("parsel-get.html")
 
 @app.route('/', methods=['POST'])
 def my_form_post():
@@ -25,21 +23,15 @@ def my_form_post():
     processes['sent_tokenize'] = request.form.get('sent_tokenizer')
     #tuple of tokenizer type and regex. If irrelevant, regex is ignored
     t_type = request.form.get('tokenizer')
-    processes['tokenizer_type'] = (t_type, '')
+    t_regex = request.form.get('token_regex')
+    processes['tokenizer_type'] = (t_type, t_regex)
     processes['pos_tag'] = request.form.get('pos_tag')
     processes['make_bag'] = request.form.get('make_bag')
     results = nltk_magic.nltk_magic(text, processes)
-    return str(processes)
-    #return render_template("results.html", results=results)
-
-@app.route('/tasks/', methods=['GET','POST'])
-def new_task():
-    if request.method == 'POST':
-        tts = request.form['name']
-        #flash(str(tts)+'is being selected')
-        ms = request.form['mymultiselect[]']
-        return "{} {}".format(ms, tts)
-    return render_template("new-task.html")    
+    #debugging purposes
+    #return str(processes)
+    return render_template("parsel-results.html", results=results)
+ 
 
 
 if __name__ == '__main__':

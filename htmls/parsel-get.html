@@ -13,7 +13,7 @@
 		<div class="col-sm-6">
 			<h2>Sentence Tokenizer</h2>
 			<p>In NLTK, you really should tokenize into sentences before anything else... but who am I to tell you what to do?</p>
-			<div class="btn-group-vertical" data-toggle="buttons" id="sent_tokenizer">
+			<div class="btn-group-vertical" data-toggle="buttons">
 				<label class="btn btn-primary">
 				    <input type="radio" name="sent_tokenizer" value="sentence_tokenize"> Punkt Sentence Tokenizer
 				</label>
@@ -38,18 +38,23 @@
 			    <input type="radio" name="tokenizer" value="treebank" id="treebank"> Treebank Word Tokenizer
 			  </label>
 			</div>
+				<h3>For Regex Tokenizer, input your own:</h3>
+				<input class="text" name="token_regex"> 
 		</div>	
 	</div> <!--close the thumbnail around the tokenizers-->
 	<div class="col-sm-3">
-		<h2>Throw in a bag of words!</h2>
-		<p>Technically, you'll get a bag of tokens, whatever that means to you.</p>
-			<button type="button" data-toggle="button" class="btn btn-primary" name="make_bag" value="make_bag"> Bag 'o Words </button>
+		<h2>Easy Decisions</h2>
+		<h3>Bag of Words</h3>
+		<p>Technically a bag of tokens, whatever that means to you.</p>
+			<input type="radio" class="btn btn-primary" name="make_bag" value="make_bag"> Bag 'o Words </input>
 	</div>
+	<div class="col-sm-3">	
 
 		<h2>Part of Speech Tagging</h2>
 		<p>Get the results of a part of speech tagger, sentence by sentence.</p>
-			<button type="button" data-toggle="button" class="btn btn-warning" name="pos_tag" id="pos_tag"> Return Part of Speech tagging </button>
-	</div>		
+			<input type="button" data-toggle="button" class="btn btn-warning" name="pos_tag" id="pos_tag" value="True"> Return Part of Speech tagging </input>
+	</div>	
+	</div>	
 
     <button type="submit" name="my-form" class="btn btn-lg btn-default">Submit</button> 
     </form>
@@ -61,5 +66,9 @@
    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script> 
 $('.btn').button();
+var button = $('#myToggleButton');
+button.on('click', function () {
+  $(this).toggleClass('active');
+});
 </script>
 {% endblock %}
