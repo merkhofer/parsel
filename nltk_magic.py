@@ -1,9 +1,11 @@
 #!/usr/bin/python
 
 import nltk.data
+from nltk import pos_tag
 from nltk.tokenize import WordPunctTokenizer,RegexpTokenizer,WhitespaceTokenizer,TreebankWordTokenizer
-import nltk
-from collections import Counter,Iterable
+from nltk.tag import UnigramTagger
+from collections import Iterable,defaultdict
+import pickle
 
 def flatten(l):
     for el in l:
@@ -26,9 +28,15 @@ def nltk_magic(text, processes):
 		tokenized = [tokenize(sent, processes['tokenizer_type']) for sent in tokenized]
 		return_me['tokenized'] = tokenized
 	if processes['make_bag']:
-		return_me['bag_of_words'] = make_bag(tokenized)
+		return_me['bag_of_words'] = make_bag(processes['make_bag'], tokenized)
 	if processes['pos_tag']:
-		return_me['pos'] = [pos_tag(tokenized_sentence) for tokenized_sentence in tokenized]
+		pos_tagged = [pos_tag(processes['pos_tag'], tokenized_sentence) 
+		for tokenized_sentence in tokenized]
+		return_me['pos'] = pos_tagged
+		#only if pos tagged can you chunk
+		if processes['chunk']:
+			chunked = [chunk(processes['chunk'], tagged_sent) for tagged_sent in pos_tagged]	
+			return_me['chunk'] = chunked
 	return return_me	
 
 def sent_tokenize(in_string):
@@ -54,17 +62,31 @@ def tokenize(sent,tokenizer_type):
 		if tokenizer != "not_implemented":
 			return tokenizer.tokenize(sent)
 		else:
-			return 'NOT IMPLEMENTED!'
+			return 'Tokenizer not implemented'
 	except ValueError: #if the input is not a list of strings
 		pass
 
-def make_bag(list_of_tokens):
+def make_bag(bag_type, list_of_tokens):
 	flat_list = flatten(list_of_tokens)
-	bag = Counter(flat_list)
+	if bag_type == 'lower_bag':
+		flat_list = [token.lower() for token in flat_list]
+	#server is 2.6, otherwise could just:
+	#bag = Counter(flat_list)
+	bag = defaultdict(int)
+	for word in flat_list:
+		bag[word] += 1
 	return bag
 
-def pos_tag(tokenized_sent):
-	return nltk.pos_tag(tokenized_sent)
+def pos_tag(pos_type, tokenized_sent):
+	if pos_type == 'unigram':
+		brown_train = pickle.load(open('res/brown_train.pkl', 'rb'))
+		unigram_tagger = UnigramTagger(brown_train)
+		return unigram_tagger.tag(tokenized_sent)
+	elif pos_type == 'max_pos':
+		return nltk.pos_tag(tokenized_sent)
+
+def chunk(chunker_type, pos_sentence):
+	return "NOT IMPLEMENTED"		
 
 
 

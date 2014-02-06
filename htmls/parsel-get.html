@@ -2,6 +2,8 @@
 {% block content %}
 <html lang="en">
 <body>
+	<h1>WARNING!</h1>
+	<p class="text-warning">Parsel is in its infancy, and it needs your help to work. Soon it will complain when you choose unreasonable combinations or try to chunk without tokenizing, but for now, just play nicely with it.</p>
 	<div id="get_text">
     	<h1>Enter some text</h1>
     	<form action="." method="POST">
@@ -57,12 +59,13 @@
 	<div class="col-sm-3">
 		<h2>Part of Speech Tagging</h2>
 			<p>Get the results of a part of speech tagger, sentence by sentence.</p>
+			<p>Unigram model trained on first 1000 sentences of Brown Corpus - train your own for real use</p>
 			<div class="btn-group-vertical" data-toggle="buttons">
 				<label class="btn btn-primary">
 				    <input type="radio" name="pos_tag" value="max_pos"> Treebank Maximum Entropy
 				</label>
 				<label class="btn btn-primary">
-				   <input type="radio" name="pos_tag" value="hmm_pos"> Treebank HMM
+				   <input type="radio" name="pos_tag" value="unigram"> Unigram
 				</label>
 			</div>
 		</div>
