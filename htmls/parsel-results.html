@@ -26,10 +26,10 @@
 		{% else %}
 			<table>
 				<tr>
-					<td>Word</td>
-					<td>Count</td>
+					<th>Word</th>
+					<th>Count</th>
 				</tr>
-				{% for term,count in results['bag_of_words'].iteritems() %}
+				{% for term,count in results['bag_of_words'] %}
 				<tr>
 					<td>{{term}}</td>
 					<td>{{count}}</td>

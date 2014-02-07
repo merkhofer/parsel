@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% block head %}
+      <p>Parsel might let you get a sneak peek at your preprocessing techniques before you implement them, for a sanity check. To that end, check back soon for moar NLTK.</p>
+      <p>The big idea for me, its creator, is to get up to speed with <a href="http://flask.pocoo.org/" target="_blank">Flask</a>, <a href="http://jinja.pocoo.org/" target="_blank">Jinja2</a>, and getting things on the web.</p>
+      <p><span class="label label-warning">Warning</span> Parsel is brand new, so play nicely until some checks are implemented. You know better than chunking without tokenizing, but Parsel does not!</p>
+{% endblock %}
 {% block content %}
-<html lang="en">
-<body>
-	<h1>WARNING!</h1>
-	<p class="text-warning">Parsel is in its infancy, and it needs your help to work. Soon it will complain when you choose unreasonable combinations or try to chunk without tokenizing, but for now, just play nicely with it.</p>
 	<div id="get_text">
     	<h1>Enter some text</h1>
     	<form action="." method="POST">
@@ -18,7 +19,10 @@
 			<p>In NLTK, you really should tokenize into sentences before anything else... but who am I to tell you what to do?</p>
 			<div class="btn-group-vertical" data-toggle="buttons">
 				<label class="btn btn-primary">
-				    <input type="radio" name="sent_tokenizer" value="sentence_tokenize"> Punkt Sentence Tokenizer
+				    <input type="radio" name="sent_tokenizer" value="punkt_sent"> Punkt Sentence Tokenizer
+				</label>
+				<label class="btn btn-primary">
+				    <input type="radio" name="sent_tokenizer" value="line"> Lines (for semi-structured data)
 				</label>
 				<label class="btn btn-primary">
 				   <input type="radio" name="sent_tokenizer" value="no_sentence"> Live Dangerously
@@ -41,7 +45,7 @@
 			    <input type="radio" name="tokenizer" value="treebank" id="treebank"> Treebank Word Tokenizer
 			  </label>
 			</div>
-				<h3>For Regex Tokenizer, input your own:</h3>
+				<h3>For Regex Tokenizer, input your own regex:</h3>
 				<input class="text" name="token_regex"> 
 		</div>	
 	</div> <!--close the thumbnail around the tokenizers-->
@@ -62,7 +66,7 @@
 				   <input type="radio" name="chunk" value="ne_chunk"> Chunk + Recognize Entities				
 			</label>
 			<label>
-				   <input type="radio" name="extract_relations" value="in_example"> ... and get "IN" relationships	
+				   <input type="radio" name="extract_relations" value="in_example" disabled> ... and get "IN" relationships	
 			</label>
 			</div>		
 	</div>

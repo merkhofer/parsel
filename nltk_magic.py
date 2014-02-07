@@ -2,13 +2,14 @@
 
 import nltk.data
 from nltk import pos_tag,ne_chunk
-from nltk.tokenize import WordPunctTokenizer,RegexpTokenizer,WhitespaceTokenizer,TreebankWordTokenizer
+from nltk.tokenize import WordPunctTokenizer,RegexpTokenizer,WhitespaceTokenizer,TreebankWordTokenizer,LineTokenizer
 from nltk.tag import UnigramTagger
 from collections import Iterable,defaultdict
 from nltk.tree import *
 from nltk.draw import tree
 import pickle
 import re
+from operator import itemgetter
 
 def flatten(l):
     for el in l:
@@ -24,8 +25,8 @@ def nltk_magic(text, processes):
 	if not processes['chunk'] and processes['extract_relations']:
 		processes['chunk']='ne_chunk'
 	
-	if processes['sent_tokenize']:
-		tokenized = sent_tokenize(text)
+	if processes['sent_tokenize'] and processes['sent_tokenize'] != 'no_sentence':
+		tokenized = sent_tokenize(processes['sent_tokenize'], text)
 		return_me['tokenized'] = tokenized
 	else:
 		#don't add this "tokenization" to product
@@ -58,9 +59,12 @@ def nltk_magic(text, processes):
 			return_me['relations'] = relations
 	return return_me	
 
-def sent_tokenize(in_string):
-	sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
-	return sent_detector.tokenize(in_string.strip())
+def sent_tokenize(tokenizer_type, in_string):
+	if tokenizer_type == 'line':
+		return LineTokenizer(blanklines='discard').tokenize(in_string)	
+	if tokenizer_type == 'punkt_sent':
+		sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
+		return sent_detector.tokenize(in_string.strip())
 
 
 def tokenize(sent,tokenizer_type):
@@ -94,7 +98,9 @@ def make_bag(bag_type, list_of_tokens):
 	bag = defaultdict(int)
 	for word in flat_list:
 		bag[word] += 1
-	return bag
+	as_tuples = bag.items()
+	sorted_bag = sorted(as_tuples, key = itemgetter(1), reverse = True)
+	return sorted_bag
 
 def pos_tag(pos_type, tokenized_sent):
 	if pos_type == 'unigram':
