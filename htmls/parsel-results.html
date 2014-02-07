@@ -45,6 +45,43 @@
 			{% else %}
 				<ul>
 				{% for sent in results['pos'] %}
+					<li> {{sent|string}}</li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+	</div>
+	<div>
+	<h1>Chunking</h1>
+			{% if not results['chunk'] %}
+				<p>No chunk result returned.</p>
+			{% else %}
+				<ul>
+				{% for sent in results['chunk'] %}
+					<li> {{sent|string}} </li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+	</div>
+	<h1>Entities</h1>
+			{% if not results['entities'] %}
+				<p>No entity result returned.</p>
+			{% else %}
+				<ul>
+				{% for entity_type,list_of_results in results['entities'].iteritems() %}
+					{% if results['entities'][entity_type] %}
+					<li> {{entity_type}}: {{list_of_results|join(' // ')}}</li>
+					{% endif %}
+				{% endfor %}
+				</ul>
+			{% endif %}
+	</div>
+	<div>
+		<h1>Relationships</h1>
+			{% if not results['relations'] %}
+				<p>No relations result returned.</p>
+			{% else %}
+				<ul>
+				{% for sent in results['relations'] %}
 					<li> {{sent|join('  ') }}</li>
 				{% endfor %}
 				</ul>

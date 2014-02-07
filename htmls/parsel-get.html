@@ -55,11 +55,21 @@
 			<label >
 			<input type="radio" name="make_bag" value="lower_bag"> ...lowercased words. 
 			</label>
+			<h3>Chunking, NE recognition</h3>
+			<p>(Always uses Maximum Entropy POS tagger in the background.)</p>
+			<div class="btn-group-vertical" data-toggle="buttons">
+			<label>
+				   <input type="radio" name="chunk" value="ne_chunk"> Chunk + Recognize Entities				
+			</label>
+			<label>
+				   <input type="radio" name="extract_relations" value="in_example"> ... and get "IN" relationships	
+			</label>
+			</div>		
 	</div>
 	<div class="col-sm-3">
 		<h2>Part of Speech Tagging</h2>
 			<p>Get the results of a part of speech tagger, sentence by sentence.</p>
-			<p>Unigram model trained on first 1000 sentences of Brown Corpus - train your own for real use</p>
+			<p>Unigram model trained on first 1000 sentences of Brown Corpus - very slow, and train your own for real use.</p>
 			<div class="btn-group-vertical" data-toggle="buttons">
 				<label class="btn btn-primary">
 				    <input type="radio" name="pos_tag" value="max_pos"> Treebank Maximum Entropy
@@ -68,6 +78,7 @@
 				   <input type="radio" name="pos_tag" value="unigram"> Unigram
 				</label>
 			</div>
+
 		</div>
 	</div>	
 

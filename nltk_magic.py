@@ -1,11 +1,14 @@
 #!/usr/bin/python
 
 import nltk.data
-from nltk import pos_tag
+from nltk import pos_tag,ne_chunk
 from nltk.tokenize import WordPunctTokenizer,RegexpTokenizer,WhitespaceTokenizer,TreebankWordTokenizer
 from nltk.tag import UnigramTagger
 from collections import Iterable,defaultdict
+from nltk.tree import *
+from nltk.draw import tree
 import pickle
+import re
 
 def flatten(l):
     for el in l:
@@ -17,6 +20,10 @@ def flatten(l):
 
 def nltk_magic(text, processes):
 	return_me = {'tokenized' : None, 'bag_of_words' : None, 'pos' : None}
+	#can't extract relations without ne chunking
+	if not processes['chunk'] and processes['extract_relations']:
+		processes['chunk']='ne_chunk'
+	
 	if processes['sent_tokenize']:
 		tokenized = sent_tokenize(text)
 		return_me['tokenized'] = tokenized
@@ -34,9 +41,21 @@ def nltk_magic(text, processes):
 		for tokenized_sentence in tokenized]
 		return_me['pos'] = pos_tagged
 		#only if pos tagged can you chunk
-		if processes['chunk']:
-			chunked = [chunk(processes['chunk'], tagged_sent) for tagged_sent in pos_tagged]	
-			return_me['chunk'] = chunked
+	if processes['chunk']:
+		#chunking only works with maximum entropy pos tagging
+		if processes['pos_tag'] != 'max_pos':
+			pos_tagged = [pos_tag('max_pos', tokenized_sentence) 
+		for tokenized_sentence in tokenized]
+		chunked = [chunk_sent(processes['chunk'], tagged_sent) for tagged_sent in pos_tagged]	
+		return_me['chunk'] = chunked
+		entities = {'PERSON': [], 'LOCATION': [], 'ORGANIZATION': [], "FACILITY": [], "GPE": [], "DATE": [],
+		"TIME": [], "MONEY" : [], "PERCENT": []}
+		for sentence in chunked:
+			get_entities(sentence, entities)
+		return_me['entities'] = entities
+		if processes['extract_relations']:
+			relations = [extract_relations(processes['extract_relations'], chunk) for chunk in chunked]
+			return_me['relations'] = relations
 	return return_me	
 
 def sent_tokenize(in_string):
@@ -83,12 +102,27 @@ def pos_tag(pos_type, tokenized_sent):
 		unigram_tagger = UnigramTagger(brown_train)
 		return unigram_tagger.tag(tokenized_sent)
 	elif pos_type == 'max_pos':
-		return nltk.pos_tag(tokenized_sent)
+		return nltk.pos_tag(tokenized_sent)		
 
-def chunk(chunker_type, pos_sentence):
-	return "NOT IMPLEMENTED"		
+def chunk_sent(chunker_type, pos_sentence):
+	#right now, only default chunker is implemented, param ignored
+	return ne_chunk(pos_sentence)
+
+def extract_relations(relation_type, chunked_sentence):
+	if relation_type == 'in_example':
+		IN = re.compile(r'.*\bin\b(?!\b.+ing)')
+		#broken
+		rels = nltk.sem.extract_rels('ORG', 'LOC', chunked_sentence, pattern = IN)
+		return rels
+	else:
+		return "NOT IMPLEMENTED"	
 
 
+def get_entities(chunk_tree, ent_dict):
+	for chunk in chunk_tree:
+		if hasattr(chunk, "node"):
+			if chunk.node in ent_dict.keys():
+				ent_dict[chunk.node].append(' '.join(c[0] for c in chunk.leaves()))
 
 
 

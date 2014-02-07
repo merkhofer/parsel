@@ -25,12 +25,14 @@ def my_form_post():
     if not text:
         return "Where's the text? I'm not making a pretty page for this... press back."
     processes['sent_tokenize'] = request.form.get('sent_tokenizer')
-    #tuple of tokenizer type and regex. If irrelevant, regex is ignored
     t_type = request.form.get('tokenizer')
+    #TODO: shouldn't mess with regex if not relevant
     t_regex = request.form.get('token_regex')
     processes['tokenizer_type'] = (t_type, t_regex)
     processes['pos_tag'] = request.form.get('pos_tag')
     processes['make_bag'] = request.form.get('make_bag')
+    processes['chunk'] = request.form.get('chunk')
+    processes['extract_relations'] = request.form.get('extract_relations')
     results = nltk_magic.nltk_magic(text, processes)
     #debugging purposes
     #return str(processes)
