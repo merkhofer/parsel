@@ -1,8 +1,6 @@
 
 {% extends "base.html" %}
 {% block content %}
-<html lang="en">
-<body>
 	<div id="tokenized">
     	<h1>Tokenized</h1>
     	<ul>
@@ -45,7 +43,10 @@
 			{% else %}
 				<ul>
 				{% for sent in results['pos'] %}
-					<li> {{sent|string}}</li>
+					<li> {% for word,pos in sent %}
+					<p style="display:inline;padding:3px"> {{word}} <em>--> {{pos}}</em> </p>
+					{% endfor %}</li>
+					}
 				{% endfor %}
 				</ul>
 			{% endif %}
@@ -57,11 +58,13 @@
 			{% else %}
 				<ul>
 				{% for sent in results['chunk'] %}
-					<li> {{sent|string}} </li>
+					<li>
+					{{sent|string}} </li>
 				{% endfor %}
 				</ul>
 			{% endif %}
 	</div>
+	<div>
 	<h1>Entities</h1>
 			{% if not results['entities'] %}
 				<p>No entity result returned.</p>

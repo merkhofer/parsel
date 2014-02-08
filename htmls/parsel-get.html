@@ -19,13 +19,13 @@
 			<p>In NLTK, you really should tokenize into sentences before anything else... but who am I to tell you what to do?</p>
 			<div class="btn-group-vertical" data-toggle="buttons">
 				<label class="btn btn-primary">
-				    <input type="radio" name="sent_tokenizer" value="punkt_sent"> Punkt Sentence Tokenizer
+				    <input type="radio" name="sent_tokenize" value="punkt_sent"> Punkt Sentence Tokenizer
 				</label>
 				<label class="btn btn-primary">
-				    <input type="radio" name="sent_tokenizer" value="line"> Lines (for semi-structured data)
+				    <input type="radio" name="sent_tokenize" value="line"> Lines (for semi-structured data)
 				</label>
 				<label class="btn btn-primary">
-				   <input type="radio" name="sent_tokenizer" value="no_sentence"> Live Dangerously
+				   <input type="radio" name="sent_tokenize" value="no_sentence"> Live Dangerously
 				</label>
 			</div>
 		</div>
@@ -78,7 +78,7 @@
 				<label class="btn btn-primary">
 				    <input type="radio" name="pos_tag" value="max_pos"> Treebank Maximum Entropy
 				</label>
-				<label class="btn btn-primary">
+				<label class="btn btn-primary disabled">
 				   <input type="radio" name="pos_tag" value="unigram"> Unigram
 				</label>
 			</div>
